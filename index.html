@@ -198,7 +198,7 @@
 
 <div class="modal" id="settings"><div class="sheet">
   <h2 style="font-size:22px">Settings</h2>
-  <p class="hint">Saved on this device only.</p>
+  <p class="hint">Saved on this device only. If the site has a feedback server set up, you can leave every field blank: these just override it.</p>
   <label for="sAgent">ElevenLabs agent ID</label>
   <input type="text" id="sAgent" placeholder="agent_...">
   <p class="hint">In ElevenAgents, open AoS Parent Call Trainer. The ID is in the page URL or under the agent's name. The agent must be published with authentication turned off.</p>
@@ -229,6 +229,16 @@
 </div></div>
 
 <script type="module">
+/* =====================================================================
+   SITE SETTINGS: fill these two in once, then every visitor is ready to go.
+   (Neither is secret. Your API keys live on the Cloudflare Worker, not here.)
+   ===================================================================== */
+const CONFIG = {
+  AGENT_ID:   "agent_9701m6d46aemfv2tx0f6xwz33065",
+  WORKER_URL: "https://aos-call-coach.eloraspringer.workers.dev"
+};
+/* ===================================================================== */
+
 /* ---------- Data ---------- */
 const PURPOSES = ["First impression","Start date & length","Prepare for the lesson","Goals & expectations"];
 
@@ -286,6 +296,10 @@ const S = {
   results: {},            // id -> {score, total, pass}
   settings: load()
 };
+const W = () => (CONFIG.WORKER_URL||"").replace(/\/$/,"");
+const agentId = () => S.settings.agentId || CONFIG.AGENT_ID;
+const useWorkerAI = () => !S.settings.aiKey && !!W();
+const useWorkerEL = () => !S.settings.apiKey && !!W();
 function load(){ try{ return JSON.parse(localStorage.getItem("aosCallSettings")) || {}; }catch(e){ return {}; } }
 function save(){ try{ localStorage.setItem("aosCallSettings", JSON.stringify(S.settings)); }catch(e){} }
 
@@ -451,14 +465,14 @@ async function call(p){
     $("#endBtn").textContent="End demo call";
     return;
   }
-  if(!S.settings.agentId){ return callError("Add your ElevenLabs agent ID in Settings (gear icon, top right) first."); }
+  if(!agentId()){ return callError("No agent ID set. Add it to CONFIG at the top of the page, or in Settings (gear icon)."); }
   try{
     const s = await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop());
   }catch(e){ return callError("Microphone access was blocked. Allow the microphone for this page and try again."); }
   try{
     const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
     conv = await Conversation.startSession({
-      agentId: S.settings.agentId,
+      agentId: agentId(),
       connectionType: "webrtc",
       dynamicVariables: { persona_id: p.id },
       onConnect: ()=>{ setStatus("Connected · you speak first"); startTimer(); $("#ring").classList.add("live"); },
@@ -487,11 +501,11 @@ async function feedbackShell(p){
     <div id="fb"><div class="loading"><div class="spin"></div><span id="fbMsg">Grading your call. This usually takes 10–30 seconds…</span></div></div></div>`;
   if(S.settings.demo) return setTimeout(()=>showFeedback(p, demoData(p)), 1200);
   const msg = t => { const m=$("#fbMsg"); if(m) m.textContent=t; };
-  const hasAI = !!S.settings.aiKey;
-  const hasEL = !!(S.settings.apiKey && convId);
+  const hasAI = !!S.settings.aiKey || !!W();
+  const hasEL = !!convId && (!!S.settings.apiKey || !!W());
 
   // 1) Start fetching ElevenLabs analysis + official transcript (if possible)
-  const elP = hasEL ? pollEL(convId, msg) : Promise.resolve({error: convId ? "No ElevenLabs API key set." : "No call ID recorded."});
+  const elP = hasEL ? pollEL(convId, msg) : Promise.resolve({error: convId ? "No ElevenLabs key or server set." : "No call ID recorded."});
 
   // 2) AI coach: grade the live transcript straight away (or wait for ElevenLabs' transcript if the live one is thin)
   let aiP = Promise.resolve(null);
@@ -518,11 +532,14 @@ async function pollEL(id, msg){
   const started=Date.now();
   while(Date.now()-started < 90000){
     let r;
-    try{ r = await fetch(`https://api.elevenlabs.io/v1/convai/conversations/${id}`, {headers:{"xi-api-key":S.settings.apiKey}}); }
+    try{ r = useWorkerEL()
+        ? await fetch(`${W()}/conversation/${id}`)
+        : await fetch(`https://api.elevenlabs.io/v1/convai/conversations/${id}`, {headers:{"xi-api-key":S.settings.apiKey}}); }
     catch(e){ return {error:"The browser blocked the request to ElevenLabs (network/CORS). Use the AI coach for feedback instead."}; }
+    if(r.status===501) return {error:"ElevenLabs key not set on the server (optional)."};
     if(r.status===401||r.status===403) return {error:`Key rejected (HTTP ${r.status}). Give the key read access to ElevenAgents/conversations.`};
     if(r.status===404){ await sleep(3000); continue; }
-    if(!r.ok) return {error:"HTTP "+r.status};
+    if(!r.ok){ const e=await r.json().catch(()=>({})); return {error:`HTTP ${r.status}${elDetail(e)?": "+elDetail(e):""}`}; }
     const d = await r.json();
     if(d.status==="failed") return {error:"ElevenLabs couldn't process this call."};
     if(d.status==="done" && d.analysis) return {data:d};
@@ -532,6 +549,7 @@ async function pollEL(id, msg){
   return {error:"ElevenLabs took too long to process the call."};
 }
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const elDetail = d => { const x=d&&d.detail; if(!x) return ""; if(typeof x==="string") return x; if(x.message) return x.message; if(Array.isArray(x)) return x.map(e=>e.msg||JSON.stringify(e)).join("; "); return JSON.stringify(x); };
 
 /* ---------- AI coach ---------- */
 const RUBRIC_FULL = `C1 Professional introduction (purpose 1). Met: gives own name, subject, "Tutor & Mentor" or "Coach", Art of Smart Education, and the student's name in the opening. Partly: one of these missing. Missed: unclear who they are or why they're calling.
@@ -575,6 +593,15 @@ ${transcript}
 }
 
 async function aiGrade(p, transcript){
+  if(useWorkerAI()){
+    const r = await fetch(`${W()}/grade`, {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({prompt: aiPrompt(p, transcript)})})
+      .catch(()=>{ throw new Error("couldn't reach the feedback server (check WORKER_URL)"); });
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error || "server HTTP "+r.status);
+    const m = String(d.text||"").match(/\{[\s\S]*\}/);
+    if(!m) throw new Error("the AI's reply wasn't in the expected format");
+    return JSON.parse(m[0]);
+  }
   const prov = S.settings.provider || "anthropic";
   const key = S.settings.aiKey;
   const prompt = aiPrompt(p, transcript);
@@ -767,13 +794,14 @@ function readSettings(){ return {agentId:$("#sAgent").value.trim(), apiKey:$("#s
   provider:$("#sProv").value, aiKey:$("#sAiKey").value.trim(), model:$("#sModel").value.trim()}; }
 $("#openSettings").onclick=()=>{ fillSettings(); $("#testELMsg").textContent=""; $("#testAIMsg").textContent=""; modal.classList.add("open"); };
 $("#testEL").onclick=async()=>{ const s=readSettings(), out=$("#testELMsg"); out.textContent="Testing…";
-  if(!s.agentId||!s.apiKey){ out.textContent="Add the agent ID and ElevenLabs key first."; return; }
-  try{ const r=await fetch(`https://api.elevenlabs.io/v1/convai/agents/${encodeURIComponent(s.agentId)}`,{headers:{"xi-api-key":s.apiKey}});
+  if(!s.apiKey && W()){ try{ const r=await fetch(`${W()}/health`); const d=await r.json(); out.textContent = r.ok ? `Server connected. AI: ${d.ai?"ready ("+d.provider+")":"no key"} · ElevenLabs checks: ${d.elevenlabs?"on":"off"}` : (d.error||"HTTP "+r.status); }catch(e){ out.textContent="Couldn't reach the server. Check WORKER_URL."; } return; }
+  if(!(s.agentId||CONFIG.AGENT_ID)||!s.apiKey){ out.textContent="Add the agent ID and ElevenLabs key first."; return; }
+  try{ const r=await fetch(`https://api.elevenlabs.io/v1/convai/agents/${encodeURIComponent(s.agentId||CONFIG.AGENT_ID)}`,{headers:{"xi-api-key":s.apiKey}});
     const d=await r.json().catch(()=>({}));
-    out.textContent = r.ok ? `Connected: "${d.name||"agent found"}"` : (r.status===401||r.status===403) ? `Key rejected (HTTP ${r.status}). Check the key's permissions.` : r.status===404 ? "Agent ID not found." : "HTTP "+r.status;
+    out.textContent = r.ok ? `Connected: "${d.name||"agent found"}"` : (r.status===401||r.status===403) ? `Key rejected (HTTP ${r.status}). Check the key's permissions.` : r.status===404 ? "Agent ID not found." : `HTTP ${r.status}: ${elDetail(d)||"no details"} (ID used: "${s.agentId}")`;
   }catch(e){ out.textContent="Blocked by the browser (network/CORS). Calls still work; use the AI coach for feedback."; } };
 $("#testAI").onclick=async()=>{ const s=readSettings(), out=$("#testAIMsg"); out.textContent="Testing…";
-  if(!s.aiKey){ out.textContent="Add an AI API key first."; return; }
+  if(!s.aiKey && !W()){ out.textContent="Add an AI API key, or set WORKER_URL in the page."; return; }
   const keep=S.settings; S.settings={...keep,...s};
   try{ const rep=await aiGrade(PERSONAS[0], "Tutor: Hi, is that Michelle?\nMichelle: Yes, speaking."); out.textContent = rep&&rep.criteria ? "Working. Feedback will be automatic." : "Replied, but in an unexpected format."; }
   catch(e){ out.textContent="Failed: "+e.message; }

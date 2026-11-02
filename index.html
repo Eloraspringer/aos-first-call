@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your First Phone Call · Art of Smart Tutor Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#18202b; --muted:#5d6672; --line:#e3e0d8; --bg:#f6f4ee; --card:#ffffff;
+    --accent:#0f6b63; --accent-soft:#e3f0ee; --warn:#b4541a; --warn-soft:#fbeee4;
+    --bad:#b42318; --bad-soft:#fdeceb; --good:#13774a; --good-soft:#e5f4ec; --new:#6941c6; --new-soft:#f1ecfb;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;line-height:1.2;margin:0}
+  button{font:inherit;cursor:pointer}
+  a{color:var(--accent)}
+
+  /* top bar */
+  .top{position:sticky;top:0;z-index:20;background:rgba(246,244,238,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top-in{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px}
+  .brand{font-weight:600;font-size:14px;letter-spacing:.02em}
+  .brand small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+  .steps{display:flex;gap:6px;margin-left:auto}
+  .step{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--muted)}
+  .step.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .gear{border:1px solid var(--line);background:var(--card);border-radius:10px;width:36px;height:36px;display:grid;place-items:center}
+
+  main{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+
+  /* article */
+  .article{max-width:720px;margin:0 auto}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+  .article h1{font-size:40px;margin:8px 0 10px}
+  .lede{font-size:18px;color:var(--muted);margin:0 0 8px}
+  .meta{font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+  .legend{display:inline-flex;align-items:center;gap:6px}
+  .article h2{font-size:24px;margin:40px 0 12px}
+  .article p{margin:0 0 14px}
+  .new{display:inline-block;font:600 10.5px/1 Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--new);background:var(--new-soft);padding:4px 7px;border-radius:6px;vertical-align:middle;margin-left:6px}
+  .purposes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
+  .purpose{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+  .purpose b{display:flex;gap:10px;align-items:center;margin-bottom:4px}
+  .num{width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-weight:600;font-size:13px;flex:none}
+  .purpose span{color:var(--muted);font-size:14.5px}
+  .check{list-style:none;padding:0;margin:0}
+  .check li{padding:8px 0 8px 30px;position:relative;border-bottom:1px dashed var(--line)}
+  .check li:before{content:"";position:absolute;left:2px;top:13px;width:14px;height:14px;border:2px solid var(--accent);border-radius:4px}
+  .flow{counter-reset:s;list-style:none;padding:0;margin:0}
+  .flow>li{counter-increment:s;position:relative;padding:0 0 22px 52px}
+  .flow>li:before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:600;font-size:14px}
+  .flow>li:after{content:"";position:absolute;left:16px;top:38px;bottom:4px;width:2px;background:var(--line)}
+  .flow>li:last-child:after{display:none}
+  .flow h3{font-family:Inter;font-size:16.5px;font-weight:600;margin:5px 0 4px}
+  .say{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:10px 14px;margin:8px 0;font-size:15px}
+  .say:before{content:"Say: ";font-weight:600;color:var(--accent)}
+  .qs{margin:6px 0 0;padding-left:18px;color:var(--ink);font-size:15px}
+  table.len{border-collapse:collapse;margin:10px 0;font-size:15px;width:100%;background:var(--card);border-radius:10px;overflow:hidden}
+  table.len td,table.len th{border:1px solid var(--line);padding:8px 12px;text-align:left}
+  table.len th{background:#faf9f6;font-weight:600}
+  .tricky{display:grid;gap:10px}
+  .trick{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+  .trick b{display:block;margin-bottom:4px}
+  .trick span{font-size:15px;color:var(--muted)}
+  .cta{margin:44px 0 0;background:var(--ink);color:#fff;border-radius:18px;padding:26px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .cta h3{font-size:22px}
+  .cta p{margin:4px 0 0;color:#c9ced6;font-size:15px}
+  .btn{border:0;border-radius:12px;padding:12px 20px;font-weight:600;background:var(--accent);color:#fff}
+  .btn.light{background:#fff;color:var(--ink)}
+  .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn.danger{background:var(--bad)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .cta .btn{margin-left:auto}
+
+  /* practice */
+  .practice{display:grid;grid-template-columns:240px 1fr;gap:24px;align-items:start}
+  .rail{position:sticky;top:84px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+  .rail h3{font-family:Inter;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:2px 4px 10px}
+  .sc{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px}
+  .sc.on{background:var(--accent-soft)}
+  .sc .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:13px;color:#fff;flex:none}
+  .sc small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
+  .sc .st{margin-left:auto;font-size:12px;font-weight:600}
+  .dots{display:flex;gap:4px;margin-top:4px}
+  .dots i{width:16px;height:4px;border-radius:2px;background:var(--line)}
+  .dots i.d{background:var(--accent)}
+  .stage{position:relative;overflow:hidden;min-height:560px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;box-shadow:0 1px 0 rgba(0,0,0,.02),0 12px 30px -18px rgba(24,32,43,.25);animation:in .35s ease}
+  @keyframes in{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+  .kicker{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .card h2{font-size:28px;margin:6px 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+  .fact{background:#faf9f6;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .fact small{display:block;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .fact div{font-weight:500}
+  .fact.wide{grid-column:1/-1}
+  .goals{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 22px}
+  .goal{border:1px dashed var(--line);border-radius:10px;padding:10px;font-size:13px;line-height:1.35}
+  .goal b{display:block;font-size:12px;color:var(--accent)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .hint{font-size:13.5px;color:var(--muted)}
+
+  .phone{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 0 4px}
+  .ring{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;font:600 36px Fraunces;color:#fff;position:relative;margin:10px 0 14px}
+  .ring.live:before,.ring.live:after{content:"";position:absolute;inset:-10px;border-radius:50%;border:2px solid currentColor;opacity:.35;animation:pulse 1.8s infinite}
+  .ring.live:after{animation-delay:.9s}
+  .ring.speaking:before{animation-duration:.9s}
+  @keyframes pulse{from{transform:scale(.9);opacity:.5}to{transform:scale(1.25);opacity:0}}
+  .status{font-weight:600}
+  .timer{font-variant-numeric:tabular-nums;color:var(--muted);font-size:14px;margin-bottom:18px}
+  .mini{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+  .mini span{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+  .tx{margin-top:18px;border-top:1px solid var(--line);padding-top:12px;max-height:260px;overflow:auto;text-align:left;width:100%}
+  .tx p{margin:0 0 8px;font-size:14.5px}
+  .tx b{font-weight:600}
+  .err{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 14px;font-size:14px;margin-top:12px;text-align:left}
+
+  .score{display:flex;align-items:center;gap:18px;margin:4px 0 22px;flex-wrap:wrap}
+  .big{font:600 44px/1 Fraunces}
+  .pill{display:inline-block;border-radius:999px;padding:5px 12px;font-weight:600;font-size:13px}
+  .pill.pass{background:var(--good-soft);color:var(--good)}
+  .pill.fail{background:var(--warn-soft);color:var(--warn)}
+  .crit-group{margin-bottom:16px}
+  .crit-group h4{margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .crit{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+  .ic{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700}
+  .ic.s{background:var(--good-soft);color:var(--good)} .ic.f{background:var(--bad-soft);color:var(--bad)} .ic.u{background:#eef0f2;color:var(--muted)}
+  .crit b{font-weight:600}
+  .crit p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+  .tip{margin-top:6px;font-size:14px;background:var(--accent-soft);border-radius:8px;padding:7px 10px}
+  .tip:before{content:"Try: ";font-weight:600;color:var(--accent)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}
+  .box{background:#faf9f6;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .box h4{margin:0 0 8px;font-family:Fraunces;font-size:17px}
+  .box dl{margin:0;font-size:14px}
+  .box dt{font-weight:600;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+  .box dd{margin:0}
+  .box ul{margin:0;padding-left:18px;font-size:14px}
+  .reveal{background:var(--new-soft);border-color:#e0d6f7}
+  details{margin-top:10px}
+  summary{cursor:pointer;font-weight:600;font-size:14px}
+  .loading{display:flex;align-items:center;gap:12px;color:var(--muted);padding:30px 0}
+  .spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  textarea.copy{width:100%;height:140px;font:12.5px/1.5 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}
+
+  .sumtable{width:100%;border-collapse:collapse;margin:16px 0}
+  .sumtable td,.sumtable th{padding:12px;border-bottom:1px solid var(--line);text-align:left}
+
+  /* settings */
+  .modal{position:fixed;inset:0;background:rgba(24,32,43,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .modal.open{display:flex}
+  .sheet{background:var(--card);border-radius:18px;max-width:560px;width:100%;padding:24px;max-height:92vh;overflow:auto}
+  .ic.p{background:var(--warn-soft);color:var(--warn)}
+  .ic.n{background:#eef0f2;color:var(--muted)}
+  .quote{font-style:italic}
+  .srcline{font-size:12.5px;color:var(--muted);margin:-12px 0 18px}
+  .fixes{counter-reset:f;list-style:none;padding:0;margin:0}
+  .fixes li{counter-increment:f;position:relative;padding:10px 0 10px 40px;border-top:1px solid var(--line)}
+  .fixes li:before{content:counter(f);position:absolute;left:0;top:10px;width:26px;height:26px;border-radius:8px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px}
+  .section-h{font-family:Fraunces;font-size:19px;margin:24px 0 8px}
+  .sheet label{display:block;font-weight:600;font-size:14px;margin:14px 0 4px}
+  .sheet input[type=text],.sheet input[type=password]{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit}
+  .sheet .hint{margin:4px 0 0}
+  .toggle{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:14px}
+
+  @media (max-width:860px){
+    .practice{grid-template-columns:1fr}
+    .rail{position:static;display:flex;gap:6px;overflow:auto;padding:8px}
+    .rail h3{display:none}
+    .sc{min-width:170px}
+    .goals{grid-template-columns:repeat(2,1fr)}
+    .two,.purposes,.facts{grid-template-columns:1fr}
+    .article h1{font-size:32px}
+    .steps .step span{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <div class="brand">Art of Smart · Tutor Onboarding<small>Module 3 · Your First Phone Call</small></div>
+  <nav class="steps">
+    <button class="step" data-go="article">1 <span>· Read</span></button>
+    <button class="step" data-go="practice">2 <span>· Practise</span></button>
+    <button class="step" data-go="summary">3 <span>· Results</span></button>
+  </nav>
+  <button class="gear" id="openSettings" title="Settings" aria-label="Settings">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+  </button>
+</div></header>
+
+<main id="app"></main>
+
+<div class="modal" id="settings"><div class="sheet">
+  <h2 style="font-size:22px">Settings</h2>
+  <p class="hint">Saved on this device only.</p>
+  <label for="sAgent">ElevenLabs agent ID</label>
+  <input type="text" id="sAgent" placeholder="agent_...">
+  <p class="hint">In ElevenAgents, open AoS Parent Call Trainer. The ID is in the page URL or under the agent's name. The agent must be published with authentication turned off.</p>
+  <label for="sKey">ElevenLabs API key (for feedback)</label>
+  <input type="password" id="sKey" placeholder="sk_...">
+  <p class="hint">Optional. Adds ElevenLabs' own checks and the official transcript to the feedback. The AI coach below works without it.</p>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="testEL" style="padding:7px 12px;font-size:14px">Test ElevenLabs connection</button><span class="hint" id="testELMsg"></span></div>
+
+  <h3 style="font-family:Inter;font-size:15px;margin:22px 0 0;padding-top:16px;border-top:1px solid var(--line)">AI coach (automatic written feedback)</h3>
+  <p class="hint">Grades every call against the rubric and writes the coaching report on the page.</p>
+  <label for="sProv">Provider</label>
+  <select id="sProv" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:#fff">
+    <option value="anthropic">Claude (Anthropic API)</option>
+    <option value="gemini">Gemini (Google AI Studio, has a free tier)</option>
+  </select>
+  <label for="sAiKey">AI API key</label>
+  <input type="password" id="sAiKey" placeholder="sk-ant-... or AIza...">
+  <label for="sModel">Model</label>
+  <input type="text" id="sModel" placeholder="">
+  <p class="hint">Leave blank for the default: <code>claude-haiku-5-5</code> or <code>gemini-2.5-flash</code>.</p>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="testAI" style="padding:7px 12px;font-size:14px">Test AI coach</button><span class="hint" id="testAIMsg"></span></div>
+
+  <div class="toggle"><input type="checkbox" id="sDemo"><label for="sDemo" style="margin:0;font-weight:500">Demo mode: skip live calls and show sample feedback</label></div>
+  <div class="row" style="margin-top:20px;justify-content:flex-end">
+    <button class="btn ghost" id="closeSettings">Cancel</button>
+    <button class="btn" id="saveSettings">Save</button>
+  </div>
+</div></div>
+
+<script type="module">
+/* ---------- Data ---------- */
+const PURPOSES = ["First impression","Start date & length","Prepare for the lesson","Goals & expectations"];
+
+const PERSONAS = [
+ { id:"A", parent:"Michelle Tan", first:"Michelle", color:"#0f6b63", student:"Ethan Tan", studentFirst:"Ethan",
+   year:"Year 11", subject:"English Advanced", setting:"In-home · Epping",
+   booking:"No start day, time or lesson length set yet.", avail:"Tue & Thu 4–8pm · Sat 9am–1pm",
+   watch:"Busy parent, short answers. Dig past \"he's doing okay\".",
+   hidden:["Essay marks dropped from mid-70s to ~60 this year","Teacher says essays describe rather than analyse, with no clear thesis","Leaves assessments to the night before and panics","Loves maths/economics, thinks English is pointless"],
+   goal:"English back to 75–80, no last-minute panics, ATAR ~90 for Commerce at UNSW",
+   constraints:"Tue/Thu after 4:30 only (basketball Mon/Wed). Will ask to meet in person first." },
+ { id:"B", parent:"David Okafor", first:"David", color:"#7a4fb5", student:"Amara Okafor", studentFirst:"Amara",
+   year:"Year 5", subject:"Mathematics", setting:"In-home · Ryde",
+   booking:"No start day, time or lesson length set yet.", avail:"Weekdays 5–7pm · Sat 9am–12pm",
+   watch:"Primary student, so the parent is your main source. A previous tutor didn't work out.",
+   hidden:["Last tutor (another company) moved too fast and drilled worksheets; Amara ended in tears","Gets anxious and shuts down or cries when stuck","Weakest at fractions and worded problems; times tables shaky"],
+   goal:"Confident enough to attempt problems alone and not upset by maths (selective test is secondary)",
+   constraints:"Saturday before 11 is best. Expects 1 hr, and 1.5 hrs feels too long for a 10-year-old." },
+ { id:"C", parent:"Sarah Whitfield", first:"Sarah", color:"#b4541a", student:"Olivia Whitfield", studentFirst:"Olivia",
+   year:"Year 12", subject:"Chemistry", setting:"Online · Zoom",
+   booking:"Office booked Wednesdays 6:00pm from next week, 1.5 hrs.", avail:"Wed 6–8pm · Thu 4–7pm · Sun 1–5pm",
+   watch:"High expectations, tests your credibility. The booked time may not hold.",
+   hidden:["Olivia wants medicine, so she needs an ATAR in the high 90s plus the UCAT","68% in her last Chemistry exam, losing most marks on calculations (moles, equilibrium)","Overloaded across 5 subjects, no revision plan, perfectionist who freezes in exams"],
+   goal:"Band 6 Chemistry at the HSC and a study plan Olivia actually follows",
+   constraints:"Wed 6pm now clashes with a UCAT course, so it needs moving (Thu 5pm or Sun pm). Wants 2-hr lessons." },
+ { id:"D", parent:"Peter Nguyen", first:"Peter", color:"#2d5a8c", student:"Jayden Nguyen", studentFirst:"Jayden",
+   year:"Year 9", subject:"Mathematics", setting:"In-home · Strathfield",
+   booking:"No start day, time or lesson length set yet.", avail:"Mon–Thu 4–7pm · Sun 2–6pm",
+   watch:"Vague, friendly, shift worker. Says \"whatever he needs\" a lot.",
+   hidden:["Marks around C, but the real worry is motivation: games late, skips homework, says school is boring","Wants someone Jayden looks up to, more mentor than tutor","Algebra hasn't made sense since the start of the year"],
+   goal:"Jayden does homework without being nagged and actually cares about school",
+   constraints:"Wants to go week to week, so you need to lock in a fixed slot (Tue 5pm works). Jayden hates the phone." }
+];
+
+const CRITERIA = [
+ { id:"C1_introduction", p:0, label:"Professional introduction", tip:"\"Hi, it's [name], the [subject] Tutor & Mentor from Art of Smart Education who's been organised to work with [student].\"" },
+ { id:"C2_call_purpose", p:0, label:"Explained why you're calling", tip:"\"I'm calling to get to know [student]'s needs so I can prepare for our first lesson, and to lock in a start day and time.\"" },
+ { id:"C3_professional_manner", p:0, label:"Warm, confident, organised", tip:"Ask one question at a time, then stop and listen. Let the parent do at least half the talking." },
+ { id:"C11_in_person_request", p:0, label:"Handled the in-person meeting request", tip:"\"Happy to do a quick 5-minute Zoom beforehand, and our first session is a Kickstarter designed for us to get to know each other.\"" },
+ { id:"C4_specific_availability", p:1, label:"Offered specific times", tip:"\"I've got Tuesday at 4:30 or Thursday at 5. Would either of those work?\"" },
+ { id:"C5_lesson_confirmed", p:1, label:"Locked in the first lesson", tip:"\"So that's Tuesday the 10th at 4:30, at your place in Epping. Perfect.\"" },
+ { id:"C6_lesson_length", p:1, label:"Set lesson length with a reason", tip:"\"For Year 11 we usually recommend 1.5 hours. That gives us time for content and essay practice, and we can review after the Kickstarter.\"" },
+ { id:"C7_contact_details", p:1, label:"Swapped contact details", tip:"\"Is this the best number to reach you if anything changes? I'll text you mine now.\"" },
+ { id:"C8_student_challenges", p:2, label:"Explored challenges and study skills", tip:"\"What's he finding hardest right now?\" then \"And how does he go with organising his study and staying motivated?\"" },
+ { id:"C9_spoke_to_student", p:2, label:"Spoke with the student", tip:"\"Would [student] be around for a quick chat? I'd love to hear what they want to work on.\"" },
+ { id:"C10_success_defined", p:3, label:"Defined what success looks like", tip:"\"If we fast-forward to the end of the year, what would make this a real success for you?\"" }
+];
+
+const RUBRIC_TEXT = CRITERIA.map(c=>`${c.id.split("_")[0]} ${c.label}`).join("\n");
+
+/* ---------- State ---------- */
+const S = {
+  view: location.hash.replace("#","") || "article",
+  i: 0, stage: "brief",
+  results: {},            // id -> {score, total, pass}
+  settings: load()
+};
+function load(){ try{ return JSON.parse(localStorage.getItem("aosCallSettings")) || {}; }catch(e){ return {}; } }
+function save(){ try{ localStorage.setItem("aosCallSettings", JSON.stringify(S.settings)); }catch(e){} }
+
+const $ = s => document.querySelector(s);
+const app = $("#app");
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clean = s => String(s||"").replace(/<\/?[A-Za-z][A-Za-z0-9_-]*>/g,"").trim();
+
+/* ---------- Router ---------- */
+function go(v){ S.view = v; location.hash = v; render(); window.scrollTo({top:0,behavior:"smooth"}); }
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+window.addEventListener("hashchange",()=>{ const v=location.hash.replace("#",""); if(v && v!==S.view){ S.view=v; render(); }});
+
+function render(){
+  document.querySelectorAll(".step").forEach(b=>b.classList.toggle("on", b.dataset.go===S.view));
+  if(S.view==="practice") return renderPractice();
+  if(S.view==="summary") return renderSummary();
+  renderArticle();
+}
+
+/* ---------- Article ---------- */
+function renderArticle(){
+  app.innerHTML = `
+  <article class="article">
+    <div class="eyebrow">Module 3 · The first phone call</div>
+    <h1>Your first phone call</h1>
+    <p class="lede">The parent has met our office, but they haven't met you. This 10-minute call is where their trust in you starts, and where you collect what you need to run a great first lesson.</p>
+    <div class="meta"><span>5 min read</span><span>Then 4 practice calls</span><span class="legend"><span class="new" style="margin:0">Added</span> = not in the current three pages</span></div>
+
+    <h2>Call within 24 hours</h2>
+    <p>When families book, we tell them you'll call within 24 hours. Calling on time shows you're organised, punctual and capable before you've taught a minute. Calling late (or not at all) undoes that before the first lesson even happens.</p>
+
+    <h2>The call has four jobs</h2>
+    <div class="purposes">
+      <div class="purpose"><b><span class="num">1</span>Make a strong first impression</b><span>Professional, warm and prepared, so arriving at the first lesson feels like meeting someone they already trust.</span></div>
+      <div class="purpose"><b><span class="num">2</span>Set the start date and lesson length</b><span>Lock in a specific day, time and place, and agree how long lessons run.</span></div>
+      <div class="purpose"><b><span class="num">3</span>Prepare for the first lesson</b><span>Find out exactly what the student needs, so you never get caught out in lesson one.</span></div>
+      <div class="purpose"><b><span class="num">4</span>Understand goals and expectations</b><span>Learn what success looks like to this family, so you work on what matters most to them.</span></div>
+    </div>
+    <p>First lessons are often make-or-break: families either keep you for the year or request someone else. Every step below serves one of these four jobs.</p>
+
+    <h2>Before you dial</h2>
+    <ul class="check">
+      <li>Read the booking: parent's name, student's name, year, subject, location, and any time already set.</li>
+      <li>Choose 2–3 <b>specific</b> slots you can offer (e.g. Tue 4:30, Thu 5:00). Specific times make booking you easy.</li>
+      <li>Find a quiet spot and have somewhere to take notes. <span class="new">Added</span></li>
+    </ul>
+
+    <h2>The call, step by step</h2>
+    <ol class="flow">
+      <li><h3>Introduce yourself</h3>
+        <div class="say">Hi, my name is [name], and I'm the [subject] Tutor &amp; Mentor from Art of Smart Education who's been organised to help [student].</div>
+        <p class="hint">Always say "Tutor &amp; Mentor" or "Coach". We do more than examinable content, because mentoring is part of the job.</p></li>
+      <li><h3>Explain why you're calling</h3>
+        <div class="say">I'm just calling to get to know [student]'s needs in more detail so I can prepare for our first lesson and we can hit the ground running, and to confirm a start day and time.</div></li>
+      <li><h3>Get the parent's view of the needs</h3>
+        <ul class="qs">
+          <li>What specific challenges does [student] need help with?</li>
+          <li>What would you like them to improve on?</li>
+          <li>How do they go with time management, motivation and organising their study?</li>
+        </ul>
+        <p class="hint" style="margin-top:8px">Vague answers ("he's doing okay") are normal. Follow up with a specific question. <span class="new">Added</span></p></li>
+      <li><h3>Ask what success looks like</h3>
+        <div class="say">If we fast-forward to the end of the year, what would make this a real success for you?</div>
+        <p class="hint">Without this, you can work hard all year on the wrong thing.</p></li>
+      <li><h3>Speak to the student</h3>
+        <p>Ask to speak to the student directly about what they're finding hard and what they want to improve. We recommend this for Year 9 and above. For younger students, the parent usually knows their needs best.</p></li>
+      <li><h3>Lock in time, place and length</h3>
+        <p>Offer your specific slots. If the office already set a time that no longer suits, adjust it so it works for both of you. Then agree the lesson length:</p>
+        <table class="len"><tr><th>Student</th><th>Default length</th></tr><tr><td>Years 7–12</td><td>1.5 hours</td></tr><tr><td>K–6</td><td>1 hour</td></tr><tr><td>Any session</td><td>Minimum 1 hour</td></tr></table>
+        <p class="hint">Tie the length to the needs you just heard. You can recommend a change after the Kickstarter (e.g. moving to 2 hours).</p></li>
+      <li><h3>Swap contact details</h3><p>Make sure each of you can reach the other if a lesson needs to move.</p></li>
+      <li><h3>Recap and close <span class="new">Added</span></h3>
+        <div class="say">So, Tuesday the 10th at 4:30 at your place, 1.5 hours, focusing on essay structure and getting ahead of assessments. I'll see you then!</div>
+        <p class="hint">Repeating it back catches mix-ups and shows you listened.</p></li>
+    </ol>
+
+    <h2>Tricky moments</h2>
+    <div class="tricky">
+      <div class="trick"><b>"Could we meet in person before the first lesson?"</b><span>Offer a quick 5-minute Zoom or video chat instead, or explain that the first session is a Kickstarter designed for getting to know each other.</span></div>
+      <div class="trick"><b>"Whenever suits you."</b><span>Don't leave it open. Offer two specific options and let them choose.</span></div>
+      <div class="trick"><b>The time the office booked doesn't work anymore</b><span>Find a new slot on the call that suits you both, and confirm it out loud.</span></div>
+      <div class="trick"><b>No answer <span class="new">Added</span></b><span>Leave a short voicemail (name, Art of Smart, reason for calling, your number), send a text, and try again later that day.</span></div>
+    </div>
+
+    <h2>After the call <span class="new">Added</span></h2>
+    <p>Send a short text confirming the day, time, place and length. Then jot down the needs and goals you heard. They're your plan for the Kickstarter.</p>
+
+    <div class="cta">
+      <div><h3>Now practise it</h3><p>Four realistic parents, each with something they won't tell you unless you ask the right way. You'll get feedback after every call.</p></div>
+      <button class="btn light" id="toPractice">Start practice calls →</button>
+    </div>
+  </article>`;
+  $("#toPractice").onclick=()=>go("practice");
+}
+
+/* ---------- Practice ---------- */
+function renderPractice(){
+  const p = PERSONAS[S.i];
+  app.innerHTML = `
+  <div class="practice">
+    <aside class="rail"><h3>Practice calls</h3>
+      ${PERSONAS.map((x,k)=>{
+        const r=S.results[x.id]; const stIdx = k<S.i||r?3:(k===S.i?["brief","call","feedback"].indexOf(S.stage):-1);
+        return `<div class="sc ${k===S.i?"on":""}"><div class="av" style="background:${x.color}">${x.first[0]}</div>
+          <div><b style="font-size:14px">${x.first}</b><small>${x.year} ${x.subject}</small>
+          <div class="dots">${[0,1,2].map(d=>`<i class="${d<stIdx||(r&&true)?"d":""}"></i>`).join("")}</div></div>
+          ${r?`<span class="st" style="color:${r.pass?"var(--good)":"var(--warn)"}">${r.score}/${r.total}</span>`:""}</div>`;
+      }).join("")}
+    </aside>
+    <section class="stage" id="stage"></section>
+  </div>`;
+  if(S.stage==="brief") brief(p);
+  else if(S.stage==="call") call(p);
+  else feedbackShell(p);
+}
+
+function brief(p){
+  $("#stage").innerHTML = `
+  <div class="card">
+    <div class="kicker">Scenario ${p.id} of ${PERSONAS.length} · Your booking</div>
+    <h2>Call ${p.parent}</h2>
+    <p class="sub">The office has booked you with this family. Read the details, then make the call.</p>
+    <div class="facts">
+      <div class="fact"><small>Parent</small><div>${p.parent}</div></div>
+      <div class="fact"><small>Student</small><div>${p.student}</div></div>
+      <div class="fact"><small>Year · Subject</small><div>${p.year} · ${p.subject}</div></div>
+      <div class="fact"><small>Lessons</small><div>${p.setting}</div></div>
+      <div class="fact wide"><small>Booking status</small><div>${p.booking}</div></div>
+      <div class="fact wide"><small>Your availability</small><div>${p.avail}</div></div>
+    </div>
+    <div class="kicker" style="margin-bottom:6px">Your four jobs on this call</div>
+    <div class="goals">${PURPOSES.map((x,k)=>`<div class="goal"><b>${k+1}</b>${x}</div>`).join("")}</div>
+    <div class="row">
+      <button class="btn" id="startBtn">${S.settings.demo?"Run demo call →":"I'm ready, start the call →"}</button>
+      <span class="hint">When it connects, the parent has just picked up. <b>You speak first.</b> Allow microphone access.</span>
+    </div>
+  </div>`;
+  $("#startBtn").onclick=()=>{ S.stage="call"; renderPractice(); };
+}
+
+/* ---- live call ---- */
+let conv=null, convId=null, tx=[], tick=null, t0=0, ended=false;
+
+async function call(p){
+  ended=false; tx=[]; convId=null;
+  $("#stage").innerHTML = `
+  <div class="card"><div class="phone">
+    <div class="kicker">Scenario ${p.id} · Live call</div>
+    <div class="ring" id="ring" style="background:${p.color};color:${p.color}"><span style="color:#fff">${p.first[0]}</span></div>
+    <h2 style="font-size:24px">${p.parent}</h2>
+    <div class="status" id="status">Connecting…</div>
+    <div class="timer" id="timer">00:00</div>
+    <button class="btn danger" id="endBtn">End call</button>
+    <div class="mini">${PURPOSES.map((x,k)=>`<span>${k+1} · ${x}</span>`).join("")}</div>
+    <details class="tx" id="txWrap"><summary>Live transcript</summary><div id="tx"></div></details>
+    <div id="callErr"></div>
+  </div></div>`;
+  $("#endBtn").onclick=endCall;
+
+  if(S.settings.demo){
+    setStatus("Demo call in progress"); startTimer(); $("#ring").classList.add("live");
+    $("#endBtn").textContent="End demo call";
+    return;
+  }
+  if(!S.settings.agentId){ return callError("Add your ElevenLabs agent ID in Settings (gear icon, top right) first."); }
+  try{
+    const s = await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop());
+  }catch(e){ return callError("Microphone access was blocked. Allow the microphone for this page and try again."); }
+  try{
+    const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client/+esm");
+    conv = await Conversation.startSession({
+      agentId: S.settings.agentId,
+      connectionType: "webrtc",
+      dynamicVariables: { persona_id: p.id },
+      onConnect: ()=>{ setStatus("Connected · you speak first"); startTimer(); $("#ring").classList.add("live"); },
+      onDisconnect: ()=>finish(),
+      onModeChange: (m)=>{ const sp=(m&&m.mode)==="speaking"; $("#ring")?.classList.toggle("speaking",sp); setStatus(sp?`${p.first} is speaking`:"Listening…"); },
+      onMessage: (m)=>{ const who=(m.source||m.role)==="user"?"You":p.first; const msg=clean(m.message||m.text); if(!msg) return; tx.push({who,msg}); drawTx(); },
+      onError: (e)=>callError("Call error: "+(e?.message||e))
+    });
+    convId = conv.getId ? conv.getId() : null;
+  }catch(e){ callError("Couldn't start the call: "+(e?.message||e)+". Check the agent ID, that the agent is published, and that authentication is off."); }
+}
+function setStatus(s){ const el=$("#status"); if(el) el.textContent=s; }
+function startTimer(){ t0=Date.now(); clearInterval(tick); tick=setInterval(()=>{ const s=Math.floor((Date.now()-t0)/1000); const el=$("#timer"); if(el) el.textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; },500); }
+function drawTx(){ const el=$("#tx"); if(!el) return; el.innerHTML = tx.map(x=>`<p><b>${esc(x.who)}:</b> ${esc(x.msg)}</p>`).join(""); }
+function callError(m){ const el=$("#callErr"); if(el) el.innerHTML=`<div class="err">${esc(m)}</div>`; setStatus("Not connected"); const b=$("#endBtn"); if(b){ b.textContent="Back to brief"; b.onclick=()=>{ S.stage="brief"; renderPractice(); }; } }
+async function endCall(){ try{ if(conv) await conv.endSession(); }catch(e){} finish(); }
+function finish(){
+  if(ended) return; ended=true; clearInterval(tick);
+  if(conv && !convId && conv.getId){ try{ convId=conv.getId(); }catch(e){} }
+  conv=null; S.stage="feedback"; renderPractice();
+}
+
+/* ---- feedback ---- */
+async function feedbackShell(p){
+  $("#stage").innerHTML = `<div class="card"><div class="kicker">Scenario ${p.id} · Feedback</div><h2>How your call with ${p.first} went</h2>
+    <div id="fb"><div class="loading"><div class="spin"></div><span id="fbMsg">Grading your call. This usually takes 10–30 seconds…</span></div></div></div>`;
+  if(S.settings.demo) return setTimeout(()=>showFeedback(p, demoData(p)), 1200);
+  const msg = t => { const m=$("#fbMsg"); if(m) m.textContent=t; };
+  const hasAI = !!S.settings.aiKey;
+  const hasEL = !!(S.settings.apiKey && convId);
+
+  // 1) Start fetching ElevenLabs analysis + official transcript (if possible)
+  const elP = hasEL ? pollEL(convId, msg) : Promise.resolve({error: convId ? "No ElevenLabs API key set." : "No call ID recorded."});
+
+  // 2) AI coach: grade the live transcript straight away (or wait for ElevenLabs' transcript if the live one is thin)
+  let aiP = Promise.resolve(null);
+  if(hasAI){
+    aiP = (async()=>{
+      let lines = tx.map(x=>`${x.who==="You"?"Tutor":x.who}: ${x.msg}`);
+      if(lines.length<2){ const el=await elP; if(el.data?.transcript) lines = el.data.transcript.filter(t=>t.message).map(t=>`${t.role==="user"?"Tutor":p.first}: ${clean(t.message)}`); }
+      if(lines.length<2) return {error:"The call was too short to grade (no transcript captured)."};
+      msg("Your AI coach is reviewing the call…");
+      try{ return {report: await aiGrade(p, lines.join("\n"))}; }catch(e){ return {error: e.message}; }
+    })();
+  }
+  const [el, ai] = await Promise.all([elP, aiP]);
+  if(S.view!=="practice"||S.stage!=="feedback") return;
+
+  if(ai?.report) return showAIReport(p, ai.report, el);
+  if(el?.data) return showFeedback(p, el.data, ai?.error ? "AI coach unavailable: "+ai.error : "");
+  const why = [ai?.error && "AI coach: "+ai.error, el?.error && "ElevenLabs: "+el.error].filter(Boolean).join(" · ") || "No feedback source is set up.";
+  fallback(p, why + " Add an AI API key in Settings to get automatic feedback.");
+}
+
+/* ElevenLabs analysis polling with clear error reasons */
+async function pollEL(id, msg){
+  const started=Date.now();
+  while(Date.now()-started < 90000){
+    let r;
+    try{ r = await fetch(`https://api.elevenlabs.io/v1/convai/conversations/${id}`, {headers:{"xi-api-key":S.settings.apiKey}}); }
+    catch(e){ return {error:"The browser blocked the request to ElevenLabs (network/CORS). Use the AI coach for feedback instead."}; }
+    if(r.status===401||r.status===403) return {error:`Key rejected (HTTP ${r.status}). Give the key read access to ElevenAgents/conversations.`};
+    if(r.status===404){ await sleep(3000); continue; }
+    if(!r.ok) return {error:"HTTP "+r.status};
+    const d = await r.json();
+    if(d.status==="failed") return {error:"ElevenLabs couldn't process this call."};
+    if(d.status==="done" && d.analysis) return {data:d};
+    msg && msg(`Waiting for ElevenLabs to finish processing (${d.status||"processing"})…`);
+    await sleep(3000);
+  }
+  return {error:"ElevenLabs took too long to process the call."};
+}
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+/* ---------- AI coach ---------- */
+const RUBRIC_FULL = `C1 Professional introduction (purpose 1). Met: gives own name, subject, "Tutor & Mentor" or "Coach", Art of Smart Education, and the student's name in the opening. Partly: one of these missing. Missed: unclear who they are or why they're calling.
+C2 States the purpose of the call (purpose 1). Met: says they're calling to understand the student's needs to prepare for the first lesson AND to confirm a start day and time. Partly: only one. Missed: neither.
+C3 Professional, confident manner (purpose 1). Met: warm, organised, listens, doesn't talk over the parent; parent does a fair share of the talking. Partly: some rambling, filler or uncertainty. Missed: disorganised, dominates, or unprofessional.
+C11 Handles an in-person meeting request (purpose 1). Met: suggests a quick 5-minute Zoom/video chat, or explains the first session is a Kickstarter for getting to know each other. Partly: hesitates, then redirects. Missed: agrees to meet in person or ignores it. N/A if the parent never asked.
+C4 Offers specific availability (purpose 2). Met: proposes concrete day-and-time options. Partly: days but no times, or an open "when suits you?" first. Missed: none offered.
+C5 Confirms a specific first lesson (purpose 2). Met: day, date, time and location/mode agreed and repeated back; a booked time that doesn't suit is changed to suit both. Partly: loose agreement. Missed: no time agreed.
+C6 Confirms lesson length using the guidelines (purpose 2). Met: discussed and linked to the student's needs; defaults 1.5 hrs Yr 7-12, 1 hr K-6, never under 1 hr. Partly: set without reasoning, or a non-standard length accepted without discussion. Missed: never raised.
+C7 Exchanges contact details (purpose 2). Met: both ways. Partly: one way. Missed: not discussed.
+C8 Explores the student's specific challenges (purpose 3). Met: specific open questions on content AND study skills (time management, motivation, organisation), with follow-ups. Partly: content only or surface-level. Missed: doesn't ask.
+C9 Speaks to the student (purpose 3). Met: asks to speak to them and asks what they find hard / want to improve. Partly: asks but doesn't probe, or gives up at first pushback. Missed: never asks. N/A for Year 8 and below if not asked.
+C10 Defines what success looks like (purpose 4). Met: asks what the parent wants by the end of the year and gets a concrete outcome. Partly: general hopes only. Missed: doesn't ask.`;
+
+const AI_SYSTEM = `You are a senior Art of Smart Education coach reviewing a new tutor's practice first phone call with a simulated parent. Be direct, specific and fair. Base every judgement only on the transcript. Australian English. Reply with ONLY valid JSON, no markdown.`;
+
+function aiPrompt(p, transcript){
+  return `# Rubric
+${RUBRIC_FULL}
+
+# Scenario
+Parent: ${p.parent}. Student: ${p.student}, ${p.year} ${p.subject}. ${p.setting}. Booking: ${p.booking} Tutor's availability: ${p.avail}.
+
+# What the parent knew but only shared if asked the right questions
+- ${p.hidden.join("\n- ")}
+Real end-of-year goal: ${p.goal}
+Scheduling: ${p.constraints}
+
+# Transcript ("Tutor" is the trainee)
+${transcript}
+
+# Return this JSON
+{
+ "summary": "one sentence overall verdict",
+ "criteria": [ {"id":"C1","score":"Met|Partly|Missed|N/A","evidence":"short direct quote from the transcript, or what was absent","try":"one natural line to say next time (empty string if Met or N/A)"} ...for C1 to C11 ],
+ "missed_info": [ {"detail":"hidden detail the tutor never uncovered","question":"the question that would have uncovered it"} ],
+ "agreed": {"first_lesson":"what was agreed or 'not agreed'","lesson_length":"what was agreed and why, or 'not discussed'","goal":"the end-of-year goal they uncovered, or 'not uncovered'"},
+ "top_fixes": [ {"problem":"one sentence","try":"exact line to say"} ] (max 3, most important first),
+ "strengths": [ "up to 2 specific things done well, each tied to a quote" ]
+}`;
+}
+
+async function aiGrade(p, transcript){
+  const prov = S.settings.provider || "anthropic";
+  const key = S.settings.aiKey;
+  const prompt = aiPrompt(p, transcript);
+  let text;
+  if(prov==="gemini"){
+    const model = S.settings.model || "gemini-2.5-flash";
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{
+      method:"POST", headers:{"content-type":"application/json"},
+      body: JSON.stringify({ systemInstruction:{parts:[{text:AI_SYSTEM}]}, contents:[{role:"user",parts:[{text:prompt}]}], generationConfig:{temperature:0.2, responseMimeType:"application/json"} })
+    }).catch(()=>{ throw new Error("couldn't reach Google's API (network blocked?)"); });
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error?.message || "HTTP "+r.status);
+    text = d.candidates?.[0]?.content?.parts?.map(x=>x.text).join("") || "";
+  } else {
+    const model = S.settings.model || "claude-haiku-5-5";
+    const r = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body: JSON.stringify({ model, max_tokens:2500, system:AI_SYSTEM, messages:[{role:"user",content:prompt}] })
+    }).catch(()=>{ throw new Error("couldn't reach Anthropic's API (network blocked?)"); });
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error?.message || "HTTP "+r.status);
+    text = (d.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("");
+  }
+  const m = text.match(/\{[\s\S]*\}/);
+  if(!m) throw new Error("the AI's reply wasn't in the expected format");
+  return JSON.parse(m[0]);
+}
+
+function showAIReport(p, rep, el){
+  const byId = {}; (rep.criteria||[]).forEach(c=>{ byId[String(c.id).split("_")[0].toUpperCase()] = c; });
+  const pts = {Met:2, Partly:1, Missed:0};
+  let got=0, max=0;
+  const rows = CRITERIA.map(c=>{
+    const k = c.id.split("_")[0]; const r = byId[k] || {score:"N/A"};
+    const s = ["Met","Partly","Missed","N/A"].includes(r.score) ? r.score : "N/A";
+    if(s!=="N/A"){ got+=pts[s]; max+=2; }
+    return {c, s, ev:r.evidence||"", tr:r.try||""};
+  });
+  const pct = max? Math.round(got/max*100):0;
+  const must = ["C4","C5","C6"].every(k=>rows.find(x=>x.c.id.startsWith(k+"_")).s==="Met");
+  const pass = pct>=80 && must;
+  S.results[p.id] = {score:got, total:max, pass};
+  const icon = {Met:["s","✓"],Partly:["p","◐"],Missed:["f","✕"],"N/A":["n","–"]};
+  const ag = rep.agreed || {};
+  const dc = asMap(el?.data?.analysis?.data_collection_results);
+  const dval = (id, fb) => esc((dc[id] && (dc[id].value ?? dc[id].result)) ?? fb ?? "Not captured");
+  const transcript = el?.data?.transcript ? el.data.transcript.filter(t=>t.message).map(t=>({who:t.role==="user"?"You":p.first,msg:clean(t.message)})) : tx;
+
+  $("#fb").innerHTML = `
+    <div class="score"><div class="big">${pct}%</div>
+      <div><span class="pill ${pass?"pass":"fail"}">${pass?"Pass":"Not yet"}</span> <span class="hint">${got}/${max} points</span>
+      <div class="hint" style="margin-top:4px">${esc(rep.summary||"")}</div></div></div>
+    <p class="srcline">Graded by your AI coach${el?.data?" · ElevenLabs checks included":""}. To pass: 80%+ and the start date, time and length all fully Met.</p>
+
+    ${rep.top_fixes?.length?`<h3 class="section-h">Fix these next time</h3><ol class="fixes">${rep.top_fixes.slice(0,3).map(f=>`<li><b>${esc(f.problem)}</b><div class="tip" style="margin-top:6px">${esc(f.try)}</div></li>`).join("")}</ol>`:""}
+
+    <h3 class="section-h">Scorecard</h3>
+    ${PURPOSES.map((name,k)=>`
+      <div class="crit-group"><h4>${k+1} · ${name}</h4>
+      ${rows.filter(x=>x.c.p===k).map(({c,s,ev,tr})=>`
+        <div class="crit"><div class="ic ${icon[s][0]}">${icon[s][1]}</div>
+          <div><b>${c.label}</b> <span class="hint">· ${s}</span>${ev?`<p class="quote">${esc(ev)}</p>`:""}
+          ${(s==="Missed"||s==="Partly")&&tr?`<div class="tip">${esc(tr)}</div>`:""}</div></div>`).join("")}
+      </div>`).join("")}
+
+    <div class="two">
+      <div class="box"><h4>What you agreed</h4><dl>
+        <dt>First lesson</dt><dd>${dval("first_lesson", ag.first_lesson)}</dd>
+        <dt>Lesson length</dt><dd>${dval("lesson_length", ag.lesson_length)}</dd>
+        <dt>Their end-of-year goal</dt><dd>${dval("parent_end_goal", ag.goal)}</dd></dl>
+        ${rep.strengths?.length?`<dt style="font-weight:600;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:12px">What worked</dt><ul style="margin-top:4px">${rep.strengths.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}</div>
+      <div class="box reveal"><h4>What ${p.first} knew that you didn't find out</h4>
+        ${rep.missed_info?.length?`<ul>${rep.missed_info.map(m=>`<li><b>${esc(m.detail)}</b><br><span class="hint">Ask: "${esc(m.question)}"</span></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">You uncovered everything. Nice digging.</p>`}
+        <details><summary>Show ${p.first}'s full brief</summary><ul style="margin-top:6px">${p.hidden.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>
+        <dl><dt>Real goal</dt><dd>${esc(p.goal)}</dd><dt>Scheduling</dt><dd>${esc(p.constraints)}</dd></dl></details></div>
+    </div>
+    ${el?.error?`<p class="hint">ElevenLabs checks not included: ${esc(el.error)}</p>`:""}
+    ${transcript.length?`<details><summary>Full transcript</summary><div class="tx">${transcript.map(x=>`<p><b>${esc(x.who)}:</b> ${esc(x.msg)}</p>`).join("")}</div></details>`:""}
+    ${nav(p)}`;
+  bindNav(p);
+}
+
+function asMap(x){ if(!x) return {}; if(Array.isArray(x)) return Object.fromEntries(x.map(v=>[v.criteria_id||v.data_collection_id||v.id, v])); return x; }
+
+function showFeedback(p, d, note){
+  const ev = asMap(d.analysis?.evaluation_criteria_results);
+  const dc = asMap(d.analysis?.data_collection_results);
+  const transcript = (d.transcript||[]).filter(t=>t.message).map(t=>({who:t.role==="user"?"You":p.first, msg:clean(t.message)}));
+  let score=0,total=0;
+  const rows = CRITERIA.map(c=>{
+    const r = ev[c.id] || {}; const res = (r.result||"unknown").toLowerCase();
+    if(res==="success"){score++;total++;} else if(res==="failure"){total++;}
+    return {c,res,why:r.rationale||""};
+  });
+  const must = ["C4_specific_availability","C5_lesson_confirmed","C6_lesson_length"].every(id=>rows.find(x=>x.c.id===id).res==="success");
+  const pass = total>0 && score/total>=0.8 && must;
+  S.results[p.id] = {score,total,pass};
+  const val = id => esc((dc[id] && (dc[id].value ?? dc[id].result)) ?? "Not captured");
+
+  $("#fb").innerHTML = `
+    <div class="score"><div class="big">${score}/${total}</div>
+      <div><span class="pill ${pass?"pass":"fail"}">${pass?"Pass":"Not yet"}</span>
+      <div class="hint" style="margin-top:4px">To pass: 80%+ of criteria, and the start date, time and length all locked in.</div></div></div>
+    ${note?`<p class="srcline">${esc(note)}</p>`:""}
+    ${PURPOSES.map((name,k)=>`
+      <div class="crit-group"><h4>${k+1} · ${name}</h4>
+      ${rows.filter(x=>x.c.p===k).map(({c,res,why})=>`
+        <div class="crit"><div class="ic ${res[0]}">${res==="success"?"✓":res==="failure"?"✕":"–"}</div>
+          <div><b>${c.label}</b>${why?`<p>${esc(why)}</p>`:res==="unknown"?`<p>Didn't come up in this call.</p>`:""}
+          ${res==="failure"?`<div class="tip">${esc(c.tip.replaceAll("[student]",p.studentFirst))}</div>`:""}</div></div>`).join("")}
+      </div>`).join("")}
+    <div class="two">
+      <div class="box"><h4>What you agreed</h4><dl>
+        <dt>First lesson</dt><dd>${val("first_lesson")}</dd>
+        <dt>Lesson length</dt><dd>${val("lesson_length")}</dd>
+        <dt>Their end-of-year goal</dt><dd>${val("parent_end_goal")}</dd>
+        <dt>Challenges you uncovered</dt><dd>${val("challenges_uncovered")}</dd></dl></div>
+      <div class="box reveal"><h4>What ${p.first} knew</h4>
+        <ul>${p.hidden.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>
+        <dl><dt>Real goal</dt><dd>${esc(p.goal)}</dd><dt>Scheduling</dt><dd>${esc(p.constraints)}</dd></dl>
+        <p class="hint" style="margin:8px 0 0">Compare this with what you uncovered. Anything missing needed a more specific question.</p></div>
+    </div>
+    ${transcript.length?`<details><summary>Full transcript</summary><div class="tx">${transcript.map(x=>`<p><b>${esc(x.who)}:</b> ${esc(x.msg)}</p>`).join("")}</div></details>`:""}
+    ${nav(p)}`;
+  bindNav(p);
+}
+
+function fallback(p, why){
+  const lines = tx.length? tx.map(x=>`${x.who}: ${x.msg}`).join("\n") : "[Paste the transcript from ElevenAgents → Conversations]";
+  const prompt = `You are a senior Art of Smart Education coach reviewing a new tutor's practice first phone call with a simulated parent. Score each criterion Met (2), Partly (1), Missed (0) or N/A with a short quote as evidence. Then list the hidden details the tutor never uncovered, and give the top 3 fixes, each with an exact line to try next time. Be direct and specific.\n\nCriteria:\n${RUBRIC_TEXT}\n\nWhat the parent (${p.parent}) knew but only shared if asked:\n- ${p.hidden.join("\n- ")}\nReal goal: ${p.goal}\nScheduling: ${p.constraints}\n\nTranscript:\n${lines}`;
+  $("#fb").innerHTML = `
+    <div class="err" style="background:var(--warn-soft);color:var(--warn)">${esc(why)}</div>
+    <div class="two">
+      <div class="box reveal"><h4>What ${p.first} knew</h4><ul>${p.hidden.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>
+        <dl><dt>Real goal</dt><dd>${esc(p.goal)}</dd><dt>Scheduling</dt><dd>${esc(p.constraints)}</dd></dl></div>
+      <div class="box"><h4>Your transcript</h4>${tx.length?`<div class="tx" style="border:0;padding:0;max-height:220px">${tx.map(x=>`<p><b>${esc(x.who)}:</b> ${esc(x.msg)}</p>`).join("")}</div>`:`<p class="hint">No live transcript was captured.</p>`}</div>
+    </div>
+    <p style="margin:0 0 6px;font-weight:600">Get written feedback</p>
+    <p class="hint" style="margin:0 0 8px">Copy this prompt into Claude for a full scored review.</p>
+    <textarea class="copy" id="gp" readonly>${esc(prompt)}</textarea>
+    <div class="row" style="margin-top:8px"><button class="btn ghost" id="copyBtn">Copy prompt</button><span class="hint" id="copied"></span></div>
+    ${nav(p)}`;
+  $("#copyBtn").onclick=async()=>{ try{ await navigator.clipboard.writeText(prompt); $("#copied").textContent="Copied"; }catch(e){ $("#gp").select(); $("#copied").textContent="Select all and copy"; } };
+  bindNav(p);
+}
+
+function nav(p){
+  const last = S.i===PERSONAS.length-1;
+  return `<div class="row" style="margin-top:22px;justify-content:space-between">
+    <button class="btn ghost" id="retry">Retry this call</button>
+    <button class="btn" id="next">${last?"See my results →":`Next parent: ${PERSONAS[S.i+1].first} →`}</button></div>`;
+}
+function bindNav(p){
+  $("#retry").onclick=()=>{ S.stage="brief"; renderPractice(); };
+  $("#next").onclick=()=>{ if(S.i<PERSONAS.length-1){ S.i++; S.stage="brief"; renderPractice(); window.scrollTo({top:0,behavior:"smooth"}); } else go("summary"); };
+}
+
+function demoData(p){
+  const res = {C1_introduction:"success",C2_call_purpose:"failure",C3_professional_manner:"success",C11_in_person_request:p.id==="A"?"success":"unknown",
+    C4_specific_availability:"success",C5_lesson_confirmed:"success",C6_lesson_length:"failure",C7_contact_details:"success",
+    C8_student_challenges:"failure",C9_spoke_to_student:p.id==="B"?"unknown":"success",C10_success_defined:"success"};
+  const why = {C1_introduction:`Introduced themselves by name as the ${p.subject} Tutor & Mentor from Art of Smart and named ${p.studentFirst}.`,
+    C2_call_purpose:"Mentioned confirming a time but never said they wanted to understand the student's needs to prepare.",
+    C6_lesson_length:"Accepted a length without linking it to the student's needs.",
+    C8_student_challenges:"Asked about content, but never about study habits, motivation or time management."};
+  return { analysis:{ evaluation_criteria_results: Object.fromEntries(Object.entries(res).map(([k,v])=>[k,{result:v,rationale:why[k]||""}])),
+    data_collection_results:{ first_lesson:{value:"Tuesday 4:30pm, starting next week"}, lesson_length:{value:"1.5 hours (no reason given)"},
+      parent_end_goal:{value:p.goal}, challenges_uncovered:{value:p.hidden[0]} } }, transcript:[] };
+}
+
+/* ---------- Summary ---------- */
+function renderSummary(){
+  const done = PERSONAS.filter(p=>S.results[p.id]);
+  app.innerHTML = `<div class="article"><div class="eyebrow">Module 3 · Results</div><h1>Your practice calls</h1>
+    <p class="lede">${done.length===PERSONAS.length?"All four scenarios done.":`${done.length} of ${PERSONAS.length} scenarios completed.`} Retry any call until it passes.</p>
+    <table class="sumtable"><tr><th>Parent</th><th>Student</th><th>Score</th><th>Result</th><th></th></tr>
+    ${PERSONAS.map((p,k)=>{const r=S.results[p.id];return `<tr><td><b>${p.parent}</b></td><td>${p.studentFirst} · ${p.year} ${p.subject}</td>
+      <td>${r?`${r.score}/${r.total}`:"–"}</td><td>${r?`<span class="pill ${r.pass?"pass":"fail"}">${r.pass?"Pass":"Not yet"}</span>`:'<span class="hint">Not attempted</span>'}</td>
+      <td><button class="btn ghost" data-redo="${k}" style="padding:6px 12px">${r?"Retry":"Start"}</button></td></tr>`;}).join("")}
+    </table></div>`;
+  document.querySelectorAll("[data-redo]").forEach(b=>b.onclick=()=>{ S.i=+b.dataset.redo; S.stage="brief"; go("practice"); });
+}
+
+/* ---------- Settings ---------- */
+const modal=$("#settings");
+function fillSettings(){ $("#sAgent").value=S.settings.agentId||""; $("#sKey").value=S.settings.apiKey||""; $("#sDemo").checked=!!S.settings.demo;
+  $("#sProv").value=S.settings.provider||"anthropic"; $("#sAiKey").value=S.settings.aiKey||""; $("#sModel").value=S.settings.model||""; }
+function readSettings(){ return {agentId:$("#sAgent").value.trim(), apiKey:$("#sKey").value.trim(), demo:$("#sDemo").checked,
+  provider:$("#sProv").value, aiKey:$("#sAiKey").value.trim(), model:$("#sModel").value.trim()}; }
+$("#openSettings").onclick=()=>{ fillSettings(); $("#testELMsg").textContent=""; $("#testAIMsg").textContent=""; modal.classList.add("open"); };
+$("#testEL").onclick=async()=>{ const s=readSettings(), out=$("#testELMsg"); out.textContent="Testing…";
+  if(!s.agentId||!s.apiKey){ out.textContent="Add the agent ID and ElevenLabs key first."; return; }
+  try{ const r=await fetch(`https://api.elevenlabs.io/v1/convai/agents/${encodeURIComponent(s.agentId)}`,{headers:{"xi-api-key":s.apiKey}});
+    const d=await r.json().catch(()=>({}));
+    out.textContent = r.ok ? `Connected: "${d.name||"agent found"}"` : (r.status===401||r.status===403) ? `Key rejected (HTTP ${r.status}). Check the key's permissions.` : r.status===404 ? "Agent ID not found." : "HTTP "+r.status;
+  }catch(e){ out.textContent="Blocked by the browser (network/CORS). Calls still work; use the AI coach for feedback."; } };
+$("#testAI").onclick=async()=>{ const s=readSettings(), out=$("#testAIMsg"); out.textContent="Testing…";
+  if(!s.aiKey){ out.textContent="Add an AI API key first."; return; }
+  const keep=S.settings; S.settings={...keep,...s};
+  try{ const rep=await aiGrade(PERSONAS[0], "Tutor: Hi, is that Michelle?\nMichelle: Yes, speaking."); out.textContent = rep&&rep.criteria ? "Working. Feedback will be automatic." : "Replied, but in an unexpected format."; }
+  catch(e){ out.textContent="Failed: "+e.message; }
+  finally{ S.settings=keep; } };
+$("#closeSettings").onclick=()=>modal.classList.remove("open");
+$("#saveSettings").onclick=()=>{ S.settings=readSettings(); save(); modal.classList.remove("open"); render(); };
+
+render();
+</script>
+</body>
+</html>
